@@ -2,6 +2,7 @@
 /*
    La NanoValise
    Copyright 2013-2021 - Eric Sérandour
+   http://3615.entropie.org
 */
    const String VERSION = "2021.03.28";
 /*   
