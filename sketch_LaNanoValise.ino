@@ -4,7 +4,7 @@
    Copyright 2013-2021 - Eric Sérandour
    http://3615.entropie.org
 */
-   const String VERSION = "2021.03.28";
+   const String VERSION = "2021.03.29";
 /*   
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,15 +20,19 @@
    along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 //////////////////////////////////////////////////////////////////////////////////////////
+/*
 
+
+*/
+//////////////////////////////////////////////////////////////////////////////////////////
 /*
   L'électronique :
   
   * Carte Arduino Nano
-  * Afficheur LCD alphanumérique 2 x 16 caractères DEM 16216 SGH + 1 potentiomètre 1k
+  * Afficheur LCD alphanumérique 2 x 16 caractères DEM 16216 SGH + 1 potentiomètre de 1 kohms
   * Convertisseur de niveaux logiques bidirectionnel 5V / 3,3 V
   * Micro SD Card Adaptater Catalex
-  * 2 boutons poussoir + 2 résistances de 10k + 2 condensateurs de 10 nF
+  * 2 boutons poussoir + 2 résistances de 10 kohms + 2 condensateurs de 10 nF
   * Capteur de CO2, température et humidité Sensirion SCD30
 
   Le circuit :
@@ -40,7 +44,7 @@
     Brochage de l'afficheur compatible HD44780 :
     1  : Vss : GND (fil noir)
     2  : Vdd : Power Supply +5V (fil rouge)
-    3  : V0 : Contrast Adjust. Point milieu du potentiomètre 1k (fil gris)
+    3  : V0 : Contrast Adjust. Point milieu du potentiomètre 1 kohms (fil gris)
     4  : RS : Register Select Signal. => D9 de l'Arduino (fil blanc)
     5  : R/W : Data Read/Write. Relié à GND (fil noir)
     6  : E : Enable Signal. => D8 de l'Arduino (fil vert)
@@ -54,6 +58,11 @@
     14 : DB7 : Data Bus Line. => D4 de l'arduino (fil jaune)
     15 : LED+ : Power supply for BKL(+). Relié à +5V (fil rouge) - Non connecté
     16 : LED- : Power supply for BKL(-). Relié à GND (fil noir) - Non connecté
+
+  * Leds
+    1 led verte en série avec une résistance de 270 ohms
+    1 led orange en série avec une résistance de 270 ohms
+    1 led rouge en série avec une résistance de 330 ohms
 
   * Clavier
   ** Bouton poussoir REC :  5V -> Bouton -> 10 kohms -> GND
@@ -79,41 +88,39 @@
 LiquidCrystal lcd(9,8,7,6,5,4);   // Correspond sur l'afficheur à RS,Enable,DB4,DB5,DB6,DB7
 const byte NB_LIGNES_LCD = 2;     // Nombre de lignes de l'écran
 const byte NB_COLONNES_LCD = 16;  // Nombre de colonnes de l'écran
-byte degre[8] = {   // Déclaration d’un tableau de 8 octets pour le caractère °.
-  B00111,           // Définition de chaque octet au format binaire :
-  B00101,           // 1 pour un pixel affiché – 0 pour un pixel éteint.
-  B00111,           // Les 3 bits de poids forts sont ici inutiles.
-  B00000,
-  B00000,
-  B00000,
-  B00000,
-  B00000
-};
 char ligne[NB_COLONNES_LCD]; // Pour le formatage des nombres avec la fonction dtostrf()
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+// *** Leds
+
+const byte LED_VERTE = A0;
+const byte LED_ORANGE = A1;
+const byte LED_ROUGE = A2;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
 // *** Clavier
 
 // *** Bouton poussoir REC
-const byte PIN_BOUTON_REC = 2; // Broche 2
+const byte BOUTON_REC = 2; // Broche 2
 boolean memoireBoutonRec = HIGH;
 byte valBoutonRec = 0;
 
 // *** Bouton poussoir PLAY
-const byte PIN_BOUTON_PLAY = 3; // Broche 3
+const byte BOUTON_PLAY = 3; // Broche 3
 boolean memoireBoutonPlay = HIGH;
 byte valBoutonPlay = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
 // *** Carte SD
-// On importe la bibliothèque
-#include <SPI.h>
-#include <SD.h>
 // Note that even if it's not used as the SS pin, the hardware SS pin (10 on most Arduino
 // boards) must be left as an output or the SD library functions will not work.
 const byte CHIP_SELECT = 10;   // Chip Select de la carte SD.
+// On importe la bibliothèque
+#include <SPI.h>
+#include <SD.h>
 File dataFile;
 String enteteFichier;
 const String SEPARATEUR =";"; // Séparateur de données pour le tableur
@@ -121,51 +128,6 @@ const String SEPARATEUR =";"; // Séparateur de données pour le tableur
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-// *** Horloge
-
-const unsigned long CADENCE[8] = {
-100,         // 100 MS
-1000,        // 1 S
-5000,        // 5 S
-15000,       // 15 S
-60000,       // 1 MIN
-300000,      // 5 MIN
-900000,      // 15 MIN
-3600000      // 1 H
-};
-unsigned long cadenceDefaut = CADENCE[2]; // Valeur par défaut.
-unsigned long deltaMesures = cadenceDefaut; // Intervalle entre 2 mesures (en ms).
-unsigned long time = 0;
-unsigned long timeOffset = 0;
-
-//////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////
-
-// *** LES CAPTEURS (début)
-
-//////////////////////////////////////////////////////////////////////////////////////////
-
-#include <Wire.h>
-#include <SparkFun_SCD30_Arduino_Library.h>
-
-SCD30 airSensor;
-
-// *** Variables
-const byte NB_MESURES_MAX = 3;
-int nbMesures;
-int mesureBrute[NB_MESURES_MAX];
-unsigned long numeroMesure = 0;
-
-//////////////////////////////////////////////////////////////////////////////////////////
-
-// *** LES CAPTEURS (fin)
-
-//////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -179,9 +141,14 @@ void setup() {
   lcd.clear();
   lcd.print("V." + VERSION);
 
+  // Leds
+  pinMode(LED_VERTE, OUTPUT);  // Led verte en sortie
+  pinMode(LED_ORANGE, OUTPUT);  // Led orange en sortie
+  pinMode(LED_ROUGE, OUTPUT);  // Led rouge en sortie
+
   // Clavier
-  pinMode(PIN_BOUTON_REC, INPUT); // Bouton en entrée.
-  pinMode(PIN_BOUTON_PLAY, INPUT); // Bouton en entrée.
+  pinMode(BOUTON_REC, INPUT); // Bouton en entrée.
+  pinMode(BOUTON_PLAY, INPUT); // Bouton en entrée.
 
   // Carte SD
   // Make sure that the default chip select pin is set to output, even if you don't use it.
