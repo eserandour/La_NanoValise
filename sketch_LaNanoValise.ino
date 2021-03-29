@@ -21,8 +21,9 @@
 */
 //////////////////////////////////////////////////////////////////////////////////////////
 /*
-
-
+   Compile sans problème avec Arduino 1.8.13.
+   Pour téléverser le programme sur la carte Arduino avec le programmateur, enlever le
+   module de carte SD afin d'éviter un conflit sur le bus SPI.
 */
 //////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -95,6 +96,17 @@ LiquidCrystal lcd(9,8,7,6,5,4);   // Correspond sur l'afficheur à RS,Enable,DB4
 const byte NB_LIGNES_LCD = 2;     // Nombre de lignes de l'écran
 const byte NB_COLONNES_LCD = 16;  // Nombre de colonnes de l'écran
 char ligne[NB_COLONNES_LCD]; // Pour le formatage des nombres avec la fonction dtostrf()
+byte degre[8] = {   // Déclaration d’un tableau de 8 octets pour le caractère °.
+  B00111,           // Définition de chaque octet au format binaire :
+  B00101,           // 1 pour un pixel affiché – 0 pour un pixel éteint.
+  B00111,           // Les 3 bits de poids forts sont ici inutiles.
+  B00000,
+  B00000,
+  B00000,
+  B00000,
+  B00000
+};
+byte caractereDegre = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -146,6 +158,7 @@ void setup() {
   lcd.begin(NB_COLONNES_LCD, NB_LIGNES_LCD);
   lcd.clear();
   lcd.print("V." + VERSION);
+  lcd.createChar(caractereDegre, degre); // création du caractère personnalisé degré
 
   // Leds
   pinMode(LED_VERTE, OUTPUT);  // Led verte en sortie
