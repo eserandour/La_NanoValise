@@ -65,6 +65,7 @@ void enregistrerFichier()
           dureeFormatee += String(nbSecondes, DEC);
         }
         lcd.print(dureeFormatee);
+        lcd.print(" ");  // Pour remplir la ligne à 16 caractères
         
         // Vers la carte SD
         // Open the file. Note that only one file can be open at a time,
