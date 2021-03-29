@@ -78,6 +78,12 @@
     MOSI -> D11 (Master Out Slave In : Sortie de données séries)
     MISO -> D12 (Master In Slave Out : Entrée de données séries)
     SCK  -> D13 (Serial ClocK : Pour synchroniser les échanges de données)
+
+  * Le capteur Sensirion SCD30 est relié de la manière suivante :
+    Vin => 3,3 V de l'Arduino
+    GND => GND
+    SCL => LV4 (Convertisseur de niveaux logiques) HV4 => A5 de l'Arduino (SCL) (fil vert)
+    SDA => LV3 (Convertisseur de niveaux logiques) HV3 => A4 de l'Arduino (SDA) (fil jaune)
 */
 //////////////////////////////////////////////////////////////////////////////////////////
 
