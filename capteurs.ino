@@ -55,6 +55,11 @@ void afficherCapteurs()
   lcd.print("CO2: ");
   lcd.print(mesureBrute[0]);
   lcd.print(" PPM");
+  lcd.setCursor(0,1);
+  lcd.print("AIR: ");
+  lcd.print(mesureBrute[1]);
+  lcd.write(caractereDegre);
+  lcd.print("C");
   if (mesureBrute[0] < 800) {
     digitalWrite(LED_VERTE, HIGH);
     digitalWrite(LED_ORANGE, LOW);
