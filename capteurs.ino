@@ -24,7 +24,7 @@ void initCapteurs()
                 + "MILLISECONDES" + SEPARATEUR 
                 + "PPMCO2" + SEPARATEUR 
                 + "°C" + SEPARATEUR 
-                + "%HUM";
+                + "%HR";
   Wire.begin();
   if (airSensor.begin() == false) {
     Serial.println("Air sensor not detected. Please check wiring. Freezing...");
@@ -59,7 +59,9 @@ void afficherCapteurs()
   lcd.print("AIR: ");
   lcd.print(mesureBrute[1]);
   lcd.write(caractereDegre);
-  lcd.print("C");
+  lcd.print("C ");
+  lcd.print(mesureBrute[2]);
+  lcd.print(" %HR");
   if (mesureBrute[0] < 800) {
     digitalWrite(LED_VERTE, HIGH);
     digitalWrite(LED_ORANGE, LOW);
