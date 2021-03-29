@@ -4,7 +4,7 @@
    Copyright 2013-2021 - Eric Sérandour
    http://3615.entropie.org
 */
-   const String VERSION = "2021.03.29";  // 23 h 11
+   const String VERSION = "2021.03.29"; // 23 h 37
 /*   
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
