@@ -53,14 +53,14 @@ void afficherCapteurs()
   lectureCapteurs();
   lcd.setCursor(0,0);
   lcd.print("CO2: ");
-  lcd.print(mesureBrute[0]);
+  lcd.print(mesureBrute[0]);  // CO2 en PPM
   lcd.print(" PPM");
   lcd.setCursor(0,1);
   lcd.print("AIR: ");
-  lcd.print(mesureBrute[1]);
+  lcd.print(mesureBrute[1]);  // Température en °C
   lcd.write(caractereDegre);
   lcd.print("C ");
-  lcd.print(mesureBrute[2]);
+  lcd.print(mesureBrute[2]);  // % d'humidité relative
   lcd.print(" %HR");
   if (mesureBrute[0] < 800) {
     digitalWrite(LED_VERTE, HIGH);
