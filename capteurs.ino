@@ -1,4 +1,21 @@
 //////////////////////////////////////////////////////////////////////////////////////////
+/* 
+   *** LES CAPTEURS
+*/
+//////////////////////////////////////////////////////////////////////////////////////////
+
+#include <Wire.h>
+#include <SparkFun_SCD30_Arduino_Library.h>
+SCD30 airSensor;
+
+// *** Variables
+const byte NB_MESURES_MAX = 3;
+int nbMesures;
+int mesureBrute[NB_MESURES_MAX];
+unsigned long numeroMesure = 0;
+boolean etatLedRouge = LOW;
+
+//////////////////////////////////////////////////////////////////////////////////////////
 
 void initCapteurs()
 {
@@ -38,6 +55,27 @@ void afficherCapteurs()
   lcd.print("CO2: ");
   lcd.print(mesureBrute[0]);
   lcd.print(" PPM");
+  if (mesureBrute[0] < 800) {
+    digitalWrite(LED_VERTE, HIGH);
+    digitalWrite(LED_ORANGE, LOW);
+    digitalWrite(LED_ROUGE, LOW);
+  }
+  else if (mesureBrute[0] >= 800 && mesureBrute[0] < 1000) {
+    digitalWrite(LED_VERTE, LOW);
+    digitalWrite(LED_ORANGE, HIGH);
+    digitalWrite(LED_ROUGE, LOW);
+  }
+  else if (mesureBrute[0] >= 1000 && mesureBrute[0] < 1500) {
+    digitalWrite(LED_VERTE, LOW);
+    digitalWrite(LED_ORANGE, LOW);
+    digitalWrite(LED_ROUGE, HIGH);
+  }
+    else if (mesureBrute[0] >= 1500) {
+    digitalWrite(LED_VERTE, LOW);
+    digitalWrite(LED_ORANGE, LOW);
+    etatLedRouge = !etatLedRouge;
+    digitalWrite(LED_ROUGE, etatLedRouge);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
