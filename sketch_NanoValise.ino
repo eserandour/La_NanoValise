@@ -1,10 +1,10 @@
-///////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 /*
    La NanoValise
    Copyright 2013-2021 - Eric Sérandour
    http://3615.entropie.org
 */
-   const String VERSION = "2021.04.07"; // 01 h 16
+   const String VERSION = "2021.04.07"; // 01 h 30
 /*   
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@
   * 2 boutons poussoir + 2 résistances de 10 kohms + 2 condensateurs de 10 nF
   * Capteur de CO2, température et humidité Sensirion SCD30
   * Capteur de température LM35CZ +
-      - Filtre passe bas : R1 = 56 kohms, C = 100 nF
-      - Montage suiveur : Ampli op monotension LM358N
+      - Filtre passe-bas : R1 = 56 kohms, C = 0,1 microfarads
+      - Montage suiveur : Amplificateur opérationnel monotension LM358N
       - Montage amplificateur non inverseur : LM358N précédent, R3 = 39 kohms, R2 = 10 kohms (Amplification théorique = (1 + (39 / 10)) = 4.9)
 
   Le circuit :
