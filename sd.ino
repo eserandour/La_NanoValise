@@ -21,6 +21,7 @@ unsigned long deltaMesures = cadenceDefaut; // Intervalle entre 2 mesures (en ms
 unsigned long time = 0;
 unsigned long timeOffset = 0;
 boolean recording = false;
+unsigned long duree = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -37,8 +38,11 @@ void enregistrerFichier()
         if (numeroMesure == 0) {
           timeOffset = time;
         }
-        unsigned long duree = time - timeOffset;
-        lcd.clear();
+        duree = time - timeOffset;
+        lectureCapteurs();       // Lecture des capteurs
+        donneesVersCarteSD();    // Ecriture sur carte SD
+        donneesVersPortSerie();  // Envoi des données vers le port série
+        
         afficherCapteurs();
         lcd.setCursor(0,1);
         lcd.print("DUREE: ");
@@ -67,38 +71,6 @@ void enregistrerFichier()
         lcd.print(dureeFormatee);
         lcd.print(" ");  // Pour remplir la ligne à 16 caractères
         
-        // Vers la carte SD
-        // Open the file. Note that only one file can be open at a time,
-        // so you have to close this one before opening another.
-        File dataFile = SD.open("data.txt", FILE_WRITE);
-        // If the file is available, write to it.
-        if (dataFile) {
-          dataFile.print(numeroMesure);
-          dataFile.print(SEPARATEUR);
-          dataFile.print(duree);
-          for (int i=0; i<(nbMesures); i++) {
-            dataFile.print(SEPARATEUR);
-            dataFile.print(mesureBrute[i]);
-          }      
-          dataFile.println("");
-          dataFile.close(); 
-        }
-        // If the file isn't open, pop up an error.
-        else {
-          Serial.println("Error opening datalog.txt");  
-         
-        }
-        
-        // Vers le port série
-        Serial.print(numeroMesure);
-        Serial.print(SEPARATEUR);
-        Serial.print(duree);
-        for (int i=0; i<(nbMesures); i++) {
-          Serial.print(SEPARATEUR);
-          Serial.print(mesureBrute[i]);
-        }
-        Serial.println("");
-        
         // Mécanisme de régulation.
         // On regarde où on en est au niveau temps parce qu'une boucle dure ici environ 33 ms
         time = millis();
@@ -110,7 +82,7 @@ void enregistrerFichier()
         }
         unsigned long tempsEcoule;
         do {
-          if ( getKeyRec() == 2) {
+          if (getKeyRec() == 2) {
             // Stoppe l'enregistrement
             recording = false;
             // Marqueur de fin d'enregistrement (pour Python)
@@ -151,6 +123,45 @@ void nouveauFichier()
 
   // Sortie sur port série
   Serial.println(entete);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void donneesVersCarteSD()
+{
+  // Open the file. Note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  File dataFile = SD.open("data.txt", FILE_WRITE);
+  // If the file is available, write to it.
+  if (dataFile) {
+    dataFile.print(numeroMesure);
+    dataFile.print(SEPARATEUR);
+    dataFile.print(duree);
+    for (int i=0; i<(nbMesures); i++) {
+      dataFile.print(SEPARATEUR);
+      dataFile.print(mesureBrute[i]);
+    }
+    dataFile.println("");
+    dataFile.close(); 
+  }
+  // If the file isn't open, pop up an error.
+  else {
+    Serial.println("Error opening datalog.txt");
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void donneesVersPortSerie()
+{
+  Serial.print(numeroMesure);
+  Serial.print(SEPARATEUR);
+  Serial.print(duree);
+  for (int i=0; i<(nbMesures); i++) {
+    Serial.print(SEPARATEUR);
+    Serial.print(mesureBrute[i]);
+  }
+  Serial.println("");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
