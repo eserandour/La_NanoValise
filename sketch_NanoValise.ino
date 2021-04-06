@@ -4,7 +4,7 @@
    Copyright 2013-2021 - Eric Sérandour
    http://3615.entropie.org
 */
-   const String VERSION = "2021.03.29"; // 23 h 37
+   const String VERSION = "2021.04.06"; // 23 h 08
 /*   
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
   * Micro SD Card Adaptater Catalex
   * 2 boutons poussoir + 2 résistances de 10 kohms + 2 condensateurs de 10 nF
   * Capteur de CO2, température et humidité Sensirion SCD30
+  * Capteur de température LM35CZ + ampli op
 
   Le circuit :
   
@@ -85,6 +86,11 @@
     GND => GND
     SCL => LV4 (Convertisseur de niveaux logiques 3,3V / 5V) HV4 => A5 de l'Arduino (SCL) (fil vert)
     SDA => LV3 (Convertisseur de niveaux logiques 3,3V / 5V) HV3 => A4 de l'Arduino (SDA) (fil jaune)
+
+ * Le capteur LM35CZ est relié à la broche A3 de l'Arduino par l'intermédiaire de :
+   - Un filtre passe-bas (R1 = 56 kohms, C = 0,1 microfarads)
+   - Un montage suiveur avec amplificateur opérationnel monotension LM358N
+   - Un montage amplificateur non inverseur avec amplificateur opérationnel monotension LM358N (R2 = 10 kohms, R3 = 39 kohms)
 */
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -106,7 +112,7 @@ byte degre[8] = {   // Déclaration d’un tableau de 8 octets pour le caractèr
   B00000,
   B00000
 };
-byte caractereDegre = 0;
+const byte DEGRE = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -115,6 +121,7 @@ byte caractereDegre = 0;
 const byte LED_VERTE = A0;
 const byte LED_ORANGE = A1;
 const byte LED_ROUGE = A2;
+boolean etatLedRouge = LOW;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -158,7 +165,7 @@ void setup() {
   lcd.begin(NB_COLONNES_LCD, NB_LIGNES_LCD);
   lcd.clear();
   lcd.print("V." + VERSION);
-  lcd.createChar(caractereDegre, degre); // création du caractère personnalisé degré
+  lcd.createChar(DEGRE, degre);; // création du caractère personnalisé degré
 
   // Leds
   pinMode(LED_VERTE, OUTPUT);  // Led verte en sortie
@@ -196,6 +203,7 @@ void setup() {
 
 void loop()
 {
+  lectureCapteurs();
   afficherCapteurs();
   delay(250);
   
