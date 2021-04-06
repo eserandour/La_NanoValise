@@ -3,9 +3,11 @@
 ########################################################################
 #
 #  La NanoValise : Récupération et traitement des données brutes
-#  Version 2021.04.06b
+#  Version 2021.04.06c
 #  Copyright 2019-2021 - Eric Sérandour
 #  http://3615.entropie.org
+#
+#  Programme écrit en Python 3
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License as
@@ -222,11 +224,6 @@ plt.ylabel("Taux de CO2 (ppm)")                                         # A modi
 
 #plt.plot(x, y, ".r")  # Les points ne sont pas reliés (r : rouge)
 plt.plot(x,y)  # Les points sont reliés
-try:
-    plt.plot(xReg,yReg)  # Courbe de régression
-except:
-    pass
-
 plt.grid(True)  # Grille
 plt.savefig("graphique.png")  # Sauvegarde du graphique au format PNG
 plt.show()
