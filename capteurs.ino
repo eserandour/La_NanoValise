@@ -5,7 +5,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 
 #include <Wire.h>
-#include <SparkFun_SCD30_Arduino_Library.h>
+#include <SparkFun_SCD30_Arduino_Library.h>  // https://github.com/sparkfun/SparkFun_SCD30_Arduino_Library
 SCD30 airSensor;
 
 // *** Variables
