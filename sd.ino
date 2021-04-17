@@ -44,6 +44,8 @@ void enregistrerFichier()
         donneesVersPortSerie();  // Envoi des données vers le port série
         
         afficherCapteurs();
+        unsigned long compteurLed = 0;
+        
         lcd.setCursor(0,1);
         lcd.print("DUREE: ");
         String dureeFormatee = "";
@@ -70,7 +72,7 @@ void enregistrerFichier()
         }
         lcd.print(dureeFormatee);
         lcd.print(" ");  // Pour remplir la ligne à 16 caractères
-        
+
         // Mécanisme de régulation.
         // On regarde où on en est au niveau temps parce qu'une boucle dure ici environ 33 ms
         time = millis();
@@ -82,6 +84,7 @@ void enregistrerFichier()
         }
         unsigned long tempsEcoule;
         do {
+          // Test du clavier
           if (getKeyRec() == 2) {
             // Stoppe l'enregistrement
             recording = false;
@@ -91,7 +94,14 @@ void enregistrerFichier()
             lcd.clear();
             break;  // On sort de la boucle do...while  
           }
-          tempsEcoule = millis() - time;     
+          // Clignotement éventuel de la led rouge
+          tempsEcoule = millis() - time;
+          if ((tempsEcoule / CLIGNOTEMENT) >= compteurLed) {
+            afficherLeds();
+            compteurLed++;
+          }
+          // Retour à la régulation
+          tempsEcoule = millis() - time;
         } while (tempsEcoule < tempsPause);
         numeroMesure++;
     }  
