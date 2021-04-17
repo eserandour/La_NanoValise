@@ -4,7 +4,7 @@
    Copyright 2013-2021 - Eric Sérandour
    http://3615.entropie.org
 */
-   const String VERSION = "2021.04.07"; // 01 h 30
+   const String VERSION = "2021.04.18"; // 00 h 48
 /*   
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -125,6 +125,7 @@ const byte LED_VERTE = A0;
 const byte LED_ORANGE = A1;
 const byte LED_ROUGE = A2;
 boolean etatLedRouge = LOW;
+const int CLIGNOTEMENT = 250;  // Un diviseur de cadenceDefaut = 5000
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -208,7 +209,8 @@ void loop()
 {
   lectureCapteurs();
   afficherCapteurs();
-  delay(250);
+  afficherLeds();
+  delay(CLIGNOTEMENT);
   
   if (getKeyRec() == 1) {
     enregistrerFichier();
