@@ -3,7 +3,7 @@
 ########################################################################
 #
 #  La NanoValise : Récupération et traitement des données brutes
-#  Version 2021.04.06c
+#  Version 2021.04.18
 #  Copyright 2019-2021 - Eric Sérandour
 #  http://3615.entropie.org
 #
@@ -128,8 +128,8 @@ def extraireDonnees(nomFichier, colX, colY):
 
 def selectionnerZoneDonnees(x, y, debut, fin):
     """Sélection d'une zone de données"""
-    x = x[debut:fin]
-    y = y[debut:fin]
+    x = x[debut:fin+1]
+    y = y[debut:fin+1]
     return numpy.array([x,y])
 
 ########################################################################
@@ -157,7 +157,6 @@ def afficherDonnees(message, x, y):
 
 
 
-
 """
 ########################################################################
 #  DEBUT DU PROGRAMME
@@ -179,8 +178,8 @@ print ()
 # Indiquer le port sélectionné dans le menu Arduino (Outils >  Port) :
 # Sous Linux : /dev/ttyACM ou ou /dev/ttyUSB suivis d'un numéro (0,1,...)
 # Sous Windows : COM suivi d'un numéro (1,2,...)
-PORT = "/dev/ttyUSB0"                                                   # A modifier éventuellement
-VITESSE = 9600  # Vitesse en bauds                                      
+PORT = "/dev/ttyUSB0"                                                   # A modifier éventuellement (Port USB)
+VITESSE = 9600  # Vitesse en bauds
 FICHIER_CSV = "data.csv"                                                # A modifier éventuellement
 enregistrerDonnees(PORT, VITESSE, FICHIER_CSV)                          # A mettre en commentaire si on veut travailler sur un fichier CSV déjà existant
 print("-----------------------------------------------------------")
@@ -193,17 +192,19 @@ x, y = extraireDonnees(FICHIER_CSV, COLONNE_X, COLONNE_Y)
 
 # Sélectionner une zone de données (x, y, ligne début, ligne fin)
 DEBUT = 0
-FIN = numpy.size(x)
+FIN = numpy.size(x) - 1
 x, y = selectionnerZoneDonnees(x, y, DEBUT, FIN)                        # A modifier éventuellement
 """afficherDonnees("Données sélectionnées :", x, y)"""
 
 # Conversion des données
-# x : Temps en secondes
-# Pour une temporisation de 100 ms, choisir 0.1 s
-temporisation = 5  # en s, min, ou h                                    # A modifier éventuellement
+# x : Temps en minutes
+temporisation = 5 / 60  # Une mesure toutes les 5 secondes
 x = x * temporisation
-# y :
-# y =                                                                   # A modifier éventuellement
+grandeurX = "Temps"                                                     # A modifier éventuellement
+uniteX = "min"                                                          # A modifier éventuellement
+# y : Taux de CO2 en ppm
+grandeurY = "Taux de CO2"                                               # A modifier éventuellement
+uniteY = "ppm"                                                          # A modifier éventuellement 
 """afficherDonnees("Données converties :", x, y)""" 
 
 ########################################################################
@@ -218,11 +219,11 @@ x = x * temporisation
 #  AFFICHAGE DU GRAPHIQUE
 ########################################################################
 
-plt.title("Taux de CO2 en fonction du temps")                           # A modifier (Titre)
-plt.xlabel("Temps (s)")                                                 # A modifier (Abscisses)
-plt.ylabel("Taux de CO2 (ppm)")                                         # A modifier (Ordonnées)
+plt.title("Taux de CO2 en fonction du temps")                           # A modifier éventuellement (Titre)
+plt.xlabel(grandeurX + " (" + uniteX + ")")  # Abscisses
+plt.ylabel(grandeurY + " (" + uniteY + ")")  # Ordonnées
 
-#plt.plot(x, y, ".r")  # Les points ne sont pas reliés (r : rouge)
+#plt.plot(x, y, ".", color = "#1F77B4")  # Les points ne sont pas reliés
 plt.plot(x,y)  # Les points sont reliés
 plt.grid(True)  # Grille
 plt.savefig("graphique.png")  # Sauvegarde du graphique au format PNG
